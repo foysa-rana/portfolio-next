@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

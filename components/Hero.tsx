@@ -3,9 +3,47 @@
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import heroImage from '@/public/hero.jpg'
+import { useEffect, useState } from 'react'
+
+interface AboutMeData {
+  name: string;
+  title: string;
+  bio: string;
+  pictureUrl: string;
+}
+
+const defaultData: AboutMeData = {
+  name: "Foysal Rana",
+  title: "Creative Developer",
+  bio: "Hi, I'm Foysal Rana. A creative developer passionate about building innovative web solutions.",
+  pictureUrl: "/hero.jpg"
+}
 
 const Hero = () => {
+  const [aboutMe, setAboutMe] = useState<AboutMeData>(defaultData)
+
+  useEffect(() => {
+    const fetchAboutMe = async () => {
+      try {
+        const response = await fetch('/api/about-me')
+        const data = await response.json()
+
+        if (data && data._id) {
+          setAboutMe({
+            name: data.name || defaultData.name,
+            title: data.title || defaultData.title,
+            bio: data.bio || defaultData.bio,
+            pictureUrl: data.pictureUrl || defaultData.pictureUrl
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch about me data:', error)
+      }
+    }
+
+    fetchAboutMe()
+  }, [])
+
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact')
     if (contactSection) {
@@ -23,10 +61,14 @@ const Hero = () => {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Crafting <span className="text-primary">Digital</span> Experiences
+              {aboutMe.title.split(' ').map((word, index) => (
+                <span key={index}>
+                  {index === 0 ? word : <span className="text-primary">{word}</span>}{' '}
+                </span>
+              ))}
             </h1>
             <p className="text-lg sm:text-xl mb-8 text-muted-foreground">
-              Hi, I&apos;m Foysal Rana. A creative developer passionate about building innovative web solutions.
+              {aboutMe.bio}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <motion.a
@@ -57,8 +99,8 @@ const Hero = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-3xl opacity-20"></div>
             <Image
-              src={heroImage}
-              alt="Foysal Rana"
+              src={aboutMe.pictureUrl.startsWith('http') ? aboutMe.pictureUrl : aboutMe.pictureUrl.startsWith('/') ? aboutMe.pictureUrl : `/${aboutMe.pictureUrl}`}
+              alt={aboutMe.name}
               className="rounded-full relative z-10 w-full aspect-square object-cover mx-auto max-w-[500px]"
               width={500}
               height={500}
