@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
 import { aboutMeSchema, type AboutMeFormData } from '@/schemas/aboutMe.schema'
 import { ZodError } from 'zod'
+import AboutMeSkeleton from './skeletons/AboutMeSkeleton'
 
 export default function AboutMeForm() {
   const { toast } = useToast()
@@ -36,23 +37,37 @@ export default function AboutMeForm() {
     const fetchAboutMe = async () => {
       try {
         const response = await fetch('/api/about-me')
+        if (!response.ok) {
+          throw new Error('Failed to fetch about me data')
+        }
         const data = await response.json()
 
         if (data && data._id) {
-          setName(data.name || '')
-          setTitle(data.title || '')
-          setBio(data.bio || '')
-          setPictureUrl(data.pictureUrl || '/placeholder.svg')
+          setName(data.name)
+          setTitle(data.title)
+          setBio(data.bio)
+          setPictureUrl(data.pictureUrl)
           setIsNewProfile(false)
         } else {
+          // Reset form if no data
+          setName('')
+          setTitle('')
+          setBio('')
+          setPictureUrl('/placeholder.svg')
           setIsNewProfile(true)
         }
-      } catch {
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to fetch about me data"
+          description: error instanceof Error ? error.message : "Failed to fetch about me data"
         })
+        // Reset form on error
+        setName('')
+        setTitle('')
+        setBio('')
+        setPictureUrl('/placeholder.svg')
+        setIsNewProfile(true)
       } finally {
         setIsInitializing(false)
       }
@@ -87,7 +102,7 @@ export default function AboutMeForm() {
         name,
         title,
         bio,
-        picture: picture || undefined
+        picture: picture // Pass the picture directly, it can be File, null, or undefined
       }
 
       // Validate form data
@@ -95,6 +110,7 @@ export default function AboutMeForm() {
         aboutMeSchema.parse(formData)
       } catch (validationError) {
         if (validationError instanceof ZodError) {
+          console.error('Validation error:', validationError)
           // Get the first error message
           const errorMessage = validationError.errors[0]?.message || 'Validation failed'
           toast({
@@ -113,7 +129,7 @@ export default function AboutMeForm() {
       submitFormData.append('name', name)
       submitFormData.append('title', title)
       submitFormData.append('bio', bio)
-      if (picture) {
+      if (picture instanceof File) {
         submitFormData.append('picture', picture)
       }
 
@@ -141,6 +157,7 @@ export default function AboutMeForm() {
         description: isNewProfile ? "Profile created successfully!" : "Profile updated successfully!"
       })
     } catch (error) {
+      console.error('Error saving profile:', error)
       toast({
         variant: "destructive",
         title: "Error",
@@ -152,13 +169,7 @@ export default function AboutMeForm() {
   }
 
   if (isInitializing) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Loading...</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <AboutMeSkeleton />
   }
 
   return (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { Menu, X, Moon, Sun } from 'lucide-react'
+import { Menu, Moon, Sun } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { usePathname } from 'next/navigation'
@@ -17,6 +17,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const isAdminPage = pathname.startsWith('/admin')
+
+  const title = pathname.split('/').pop()
 
   useEffect(() => {
     setIsMounted(true)
@@ -63,14 +65,19 @@ const Header = () => {
     >
       <nav className={`${isAdminPage ? '' : 'container'} mx-auto px-6 py-4 `}>
         <div className="flex justify-between items-center">
-          <motion.a
-            href={isAdminPage ? '/admin' : '/'}
-            className="text-2xl font-bold text-primary uppercase"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {isAdminPage ? 'Admin' : 'Foysal Rana'}
-          </motion.a>
+          <div className="flex items-center">
+            <motion.a
+              href={isAdminPage ? '/admin' : '/'}
+              className="text-2xl font-bold text-primary uppercase"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isAdminPage ? 'Admin' : 'Foysal Rana'}
+            </motion.a>
+            {isAdminPage && (
+              <h1 className="text-3xl font-bold ml-48 capitalize">{title === 'admin' ? 'About Me' : title}</h1>
+            )}
+          </div>
           <div className="hidden md:flex space-x-6 items-center">
             {!isAdminPage && <NavItems />}
             {isMounted && (

@@ -1,43 +1,104 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Github, Linkedin, Twitter, Instagram, Facebook } from 'lucide-react'
+import { Github, Linkedin, Twitter, Instagram, Facebook, Loader2 } from 'lucide-react'
+import { toast } from 'react-toastify'
 
 interface SocialMedia {
-  id: number
+  _id?: string
   platform: string
   url: string
+  order?: number
 }
 
 export default function SocialMediaManager() {
-  const [socialMedias, setSocialMedias] = useState<SocialMedia[]>([
-    { id: 1, platform: 'GitHub', url: 'https://github.com/foysalrana' },
-    { id: 2, platform: 'LinkedIn', url: 'https://linkedin.com/in/foysalrana' },
-    { id: 3, platform: 'Twitter', url: 'https://twitter.com/foysalrana' }
-  ])
+  const [socialMedias, setSocialMedias] = useState<SocialMedia[]>([])
   const [newSocialMedia, setNewSocialMedia] = useState<SocialMedia>({
-    id: 0,
     platform: '',
     url: ''
   })
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const addSocialMedia = () => {
-    if (newSocialMedia.platform && newSocialMedia.url) {
-      setSocialMedias([...socialMedias, { ...newSocialMedia, id: Date.now() }])
-      setNewSocialMedia({
-        id: 0,
-        platform: '',
-        url: ''
-      })
+  useEffect(() => {
+    fetchSocialMedia()
+  }, [])
+
+  const fetchSocialMedia = async () => {
+    try {
+      const response = await fetch('/api/social-media')
+      if (!response.ok) {
+        throw new Error('Failed to fetch social media')
+      }
+      const data = await response.json()
+      setSocialMedias(data)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to load social media'
+      toast.error(message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const removeSocialMedia = (id: number) => {
-    setSocialMedias(socialMedias.filter(sm => sm.id !== id))
+  const addSocialMedia = async () => {
+    if (!newSocialMedia.platform || !newSocialMedia.url) {
+      toast.error('Please fill in all fields')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const response = await fetch('/api/social-media', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newSocialMedia),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to add social media')
+      }
+
+      const data = await response.json()
+      setSocialMedias([...socialMedias, data])
+      setNewSocialMedia({
+        platform: '',
+        url: ''
+      })
+      toast.success('Social media added successfully')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to add social media'
+      toast.error(message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const removeSocialMedia = async (id: string) => {
+    setDeletingId(id)
+    try {
+      const response = await fetch(`/api/social-media/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to remove social media')
+      }
+
+      setSocialMedias(socialMedias.filter(sm => sm._id !== id))
+      toast.success('Social media removed successfully')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to remove social media'
+      toast.error(message)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const getIcon = (platform: string) => {
@@ -55,6 +116,26 @@ export default function SocialMediaManager() {
       default:
         return null
     }
+  }
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Social Media</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/4" />
+                <div className="h-10 bg-gray-200 rounded w-full" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -83,10 +164,19 @@ export default function SocialMediaManager() {
             />
           </div>
         </div>
-        <Button onClick={addSocialMedia}>Add Social Media</Button>
+        <Button onClick={addSocialMedia} disabled={submitting}>
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Adding...
+            </>
+          ) : (
+            'Add Social Media'
+          )}
+        </Button>
         <div className="space-y-2">
           {socialMedias.map(sm => (
-            <div key={sm.id} className="flex items-center justify-between bg-secondary p-3 rounded-md">
+            <div key={sm._id} className="flex items-center justify-between bg-secondary p-3 rounded-md">
               <div className="flex items-center space-x-2">
                 {getIcon(sm.platform)}
                 <span>{sm.platform}</span>
@@ -95,17 +185,26 @@ export default function SocialMediaManager() {
                 <a href={sm.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">
                   View Profile
                 </a>
-                <Button variant="destructive" size="sm" onClick={() => removeSocialMedia(sm.id)}>Remove</Button>
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={() => sm._id && removeSocialMedia(sm._id)}
+                  disabled={deletingId === sm._id}
+                >
+                  {deletingId === sm._id ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Removing...
+                    </>
+                  ) : (
+                    'Remove'
+                  )}
+                </Button>
               </div>
             </div>
           ))}
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" onClick={() => console.log('Saving social media:', socialMedias)}>
-          Save Social Media
-        </Button>
-      </CardFooter>
     </Card>
   )
 }

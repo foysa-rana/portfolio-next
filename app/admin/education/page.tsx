@@ -1,10 +1,12 @@
 import EducationManager from '@/components/EducationManager'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-export default function AdminEducation() {
+export default function EducationPage() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Education Management</h1>
+    <div className="container mx-auto mt-4">
       <EducationManager />
+      <ToastContainer />
     </div>
   )
 }

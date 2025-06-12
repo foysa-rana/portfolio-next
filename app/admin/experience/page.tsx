@@ -1,10 +1,12 @@
 import ExperienceManager from '@/components/ExperienceManager'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-export default function AdminExperience() {
+export default function ExperiencePage() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Experience Management</h1>
+    <div className="container mx-auto mt-4">
       <ExperienceManager />
+      <ToastContainer />
     </div>
   )
 }

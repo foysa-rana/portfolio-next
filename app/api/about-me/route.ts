@@ -10,6 +10,7 @@ export async function GET() {
     const aboutMe = await AboutMe.findOne().sort({ createdAt: -1 });
     return NextResponse.json(aboutMe || {});
   } catch (error) {
+    console.error('Error fetching about me data:', error);
     return NextResponse.json(
       { error: 'Failed to fetch about me data' },
       { status: 500 }
@@ -30,18 +31,20 @@ export async function POST(request: Request) {
       name,
       title,
       bio,
-      picture
+      picture: picture || undefined // Convert null to undefined for validation
     });
 
     // Handle image upload if present
     let pictureUrl = '/placeholder.svg';
-    if (picture) {
+    if (picture instanceof File) {
       pictureUrl = await uploadImage(picture);
     }
 
     await connectDB();
     const aboutMe = await AboutMe.create({
-      ...validatedData,
+      name,
+      title,
+      bio,
       pictureUrl
     });
     
@@ -73,12 +76,12 @@ export async function PUT(request: Request) {
       name,
       title,
       bio,
-      picture
+      picture: picture || undefined // Convert null to undefined for validation
     });
 
     // Handle image upload if present
     let pictureUrl;
-    if (picture) {
+    if (picture instanceof File) {
       pictureUrl = await uploadImage(picture);
     }
 
@@ -86,7 +89,9 @@ export async function PUT(request: Request) {
     const aboutMe = await AboutMe.findOneAndUpdate(
       {},
       {
-        ...validatedData,
+        name,
+        title,
+        bio,
         ...(pictureUrl && { pictureUrl })
       },
       { new: true, upsert: true }
@@ -113,6 +118,7 @@ export async function DELETE() {
     await AboutMe.deleteOne({});
     return NextResponse.json({ message: 'About me data deleted successfully' });
   } catch (error) {
+    console.error('Error deleting about me data:', error);
     return NextResponse.json(
       { error: 'Failed to delete about me data' },
       { status: 500 }
