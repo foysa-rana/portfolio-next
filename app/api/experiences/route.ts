@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from 'next/server';
 import dbConnect from "@/db/connection"
 import Experience from "@/models/Experience.model"
 
@@ -7,7 +7,7 @@ export async function GET() {
     await dbConnect()
     const experiences = await Experience.find({}).sort({ startDate: -1 })
     return NextResponse.json(experiences)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch experiences" }, { status: 500 })
   }
 }
@@ -18,10 +18,11 @@ export async function POST(request: Request) {
     await dbConnect()
     const experience = await Experience.create(body)
     return NextResponse.json(experience)
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to create experience";
     return NextResponse.json(
-      { error: error.message || "Failed to create experience" },
+      { error: errorMessage },
       { status: 500 }
     )
   }
-} 
+}

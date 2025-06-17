@@ -17,7 +17,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
     return NextResponse.json(skill);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch skill' }, { status: 500 });
   }
 }
@@ -32,7 +32,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
     return NextResponse.json(skill);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update skill' }, { status: 500 });
   }
 }
@@ -46,7 +46,7 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
     return NextResponse.json({ message: 'Skill deleted successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to delete skill' }, { status: 500 });
   }
-} 
+}

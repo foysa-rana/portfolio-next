@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { toast } from 'react-toastify'
@@ -115,9 +116,11 @@ const Projects = () => {
             >
               {projects.find(p => p._id === selectedId) && (
                 <>
-                  <img
+                  <Image
                     src={projects.find(p => p._id === selectedId)!.image}
                     alt={projects.find(p => p._id === selectedId)!.title}
+                    width={600}
+                    height={256}
                     className="w-full h-64 object-cover rounded-lg mb-4"
                   />
                   <h3 className="text-2xl font-semibold mb-2">

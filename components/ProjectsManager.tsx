@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -248,9 +249,11 @@ export default function ProjectsManager() {
                     />
                     {imagePreview && (
                       <div className="relative w-full h-48">
-                        <img
+                        <Image
                           src={imagePreview}
                           alt="Preview"
+                          width={400}
+                          height={192}
                           className="w-full h-full object-cover rounded-md"
                         />
                         <Button
@@ -316,9 +319,11 @@ export default function ProjectsManager() {
             <Card key={project._id}>
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-4">
-                  <img 
+                  <Image 
                     src={project.image}
-                    alt={project.title} 
+                    alt={project.title}
+                    width={96}
+                    height={96}
                     className="w-24 h-24 object-cover rounded-md" 
                   />
                   <div>

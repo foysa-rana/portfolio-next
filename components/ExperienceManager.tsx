@@ -41,7 +41,7 @@ const customDatePickerStyles = {
 export default function ExperienceManager() {
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [loading, setLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [accordionValue, setAccordionValue] = useState<string>("")
   const [loadingId, setLoadingId] = useState<string>("")
@@ -104,7 +104,7 @@ export default function ExperienceManager() {
         throw new Error(data.error || 'Failed to fetch experiences')
       }
       setExperiences(data)
-    } catch (error) {
+    } catch {
       toast.error('Failed to load experiences')
     } finally {
       setLoading(false)
@@ -153,7 +153,7 @@ export default function ExperienceManager() {
         setIsEditing(false)
         setAccordionValue("")
         toast.success('Experience updated successfully')
-      } catch (error) {
+      } catch {
         toast.error('Failed to update experience')
       }
     } else {
@@ -195,7 +195,7 @@ export default function ExperienceManager() {
           responsibilities: ['']
         })
         toast.success('Experience added successfully')
-      } catch (error) {
+      } catch {
         toast.error('Failed to add experience')
       }
     } else {
@@ -243,7 +243,7 @@ export default function ExperienceManager() {
 
       setExperiences(experiences.filter(exp => exp._id !== id))
       toast.success('Experience removed successfully')
-    } catch (error) {
+    } catch {
       toast.error('Failed to remove experience')
     } finally {
       setLoadingId("")

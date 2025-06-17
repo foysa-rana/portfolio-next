@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
@@ -116,7 +117,7 @@ const Skills = () => {
             >
               <div className="flex items-center gap-3 text-white">
                 {skill.icon ? (
-                  <img src={skill.icon} alt={skill.name} className="w-5 h-5" />
+                  <Image src={skill.icon} alt={skill.name} width={20} height={20} className="w-5 h-5" />
                 ) : (
                   <Code2 className="w-5 h-5" />
                 )}

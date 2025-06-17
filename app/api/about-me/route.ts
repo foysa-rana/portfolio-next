@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const bio = formData.get('bio') as string;
 
     // Validate the data
-    const validatedData = aboutMeSchema.parse({
+    aboutMeSchema.parse({
       name,
       title,
       bio,
@@ -72,7 +72,7 @@ export async function PUT(request: Request) {
     const bio = formData.get('bio') as string;
 
     // Validate the data
-    const validatedData = aboutMeSchema.parse({
+    aboutMeSchema.parse({
       name,
       title,
       bio,
@@ -124,4 +124,4 @@ export async function DELETE() {
       { status: 500 }
     );
   }
-} 
+}

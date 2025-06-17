@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from 'next/server';
 import dbConnect from "@/db/connection"
 import Experience from "@/models/Experience.model"
 
@@ -26,7 +26,7 @@ export async function PUT(request: Request, { params }: Props) {
     }
     
     return NextResponse.json(experience)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update experience" },
       { status: 500 }
@@ -48,10 +48,10 @@ export async function DELETE(request: Request, { params }: Props) {
     }
     
     return NextResponse.json(experience)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete experience" },
       { status: 500 }
     )
   }
-} 
+}

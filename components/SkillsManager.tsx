@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,10 +27,6 @@ export default function SkillsManager() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchSkills()
-  }, [])
-
   const fetchSkills = async () => {
     try {
       const response = await fetch('/api/skills')
@@ -51,6 +48,10 @@ export default function SkillsManager() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchSkills()
+  }, [])
 
   const addSkill = async () => {
     if (!newSkill.trim()) return
@@ -231,9 +232,11 @@ export default function SkillsManager() {
                               <GripVertical className="h-4 w-4 text-muted-foreground" />
                             </div>
                             {skill.icon && (
-                              <img
+                              <Image
                                 src={skill.icon}
                                 alt={skill.name}
+                                width={20}
+                                height={20}
                                 className="w-5 h-5"
                               />
                             )}
